@@ -2,11 +2,14 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
 // import App from './App';
-import Example from './example';
-import TimerDashboard from '../public/JS/timeAPP';
+// import TimerDashboard from './timeAPP2';
 import * as serviceWorker from './serviceWorker';
+// import  BootStrapExample from "./reactBootStrapExample"
+import D3Example from "./d3Example"
 
-ReactDOM.render(<TimerDashboard />, document.getElementById('root'));
+// ReactDOM.render(<TimerDashboard />, document.getElementById('root'));
+// ReactDOM.render(<BootStrapExample />, document.getElementById('reactBootStrap'));
+ReactDOM.render(<D3Example />, document.getElementById('reactD3'));
 
 // If you want your app to work offline and load faster, you can change
 // unregister() to register() below. Note this comes with some pitfalls.

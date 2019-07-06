@@ -1,5 +1,5 @@
 import React from 'react';
-import './CSS/example.css';
+import '../public/CSS/timeApp.import.css';
 
 class Square extends  React.Component {
     render(){
