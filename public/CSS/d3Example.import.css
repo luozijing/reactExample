@@ -10,9 +10,6 @@
 .node-text{
     text-anchor: middle
 }
-.tspan{
-    text-anchor: middle
-}
 .node-img{
     cursor: grab;
 }
@@ -29,22 +26,39 @@
 }
 
 .board{
-    overflow:hidden;
-    height:400px;
-    background-color: #999999;
-    margin:20px;
+
 }
-.board-title{
-    margin-top: 20px;
-    margin-left: 20px;
+.board .boardBackground{
+    fill: #b8b8b8;
+    stroke: black;
+    stroke-width: 2px;
 }
-.board-content{
+.board .board-title{
+
+}
+.board .board-back{
     position: absolute;
-    left: 70px;
-    top: 120px;
-    width: 80px;
-    height: 100px;
-    background: white;
+    left:40px;
+    z-index: -9999;
+    width:1300px;
+}
+.board .board-aside{
+    position: absolute;
+    z-index: 1111;
+    height:0;
+}
+.board .board-aside .boardAside{
+    fill: #ffffff;
+}
+.board .board-aside .board-text{
+    cursor: pointer;
+}
+.board .board-aside .board-text:hover{
+    fill: burlywood;
+}
+.board .board-start{
+    position: absolute;
+    z-index: 9999;
 }
 .border-content-button{
     margin-top: 30px;
@@ -53,16 +67,21 @@
 
 .path{
     fill: none;
-    stroke: #57cc1a;
-    stroke-width: 2px;
+    stroke: #67f91f;
+    stroke-width: 3px;
     marker-end:url(#arrow)
 }
 .path circle {
     fill: #59cc59;
     opacity: 0.7;
 }
-
+.drugButton{
+    width:100%;
+    border: #949494 solid 1px;
+    border-radius: 4px;
+}
 .nodeInterface{
     cursor: grab;
     fill : #ff9f44;
+    /*stroke-width: 10px;*/
 }

@@ -1,18 +1,66 @@
 import React from "react"
-import * as d3 from "d3"
-import {Button} from  "react-bootstrap"
-import {Form} from "react-bootstrap"
-import {Modal} from "react-bootstrap"
-import {DropdownButton} from 'react-bootstrap'
-import {Dropdown} from 'react-bootstrap'
+import {Button,Form,Modal,DropdownButton,Dropdown} from  "react-bootstrap"
 import "../public/CSS/d3Example.import.css"
-import {LinkView} from "../public/JS/pathLink"
-import {GeneratePathData} from "../public/JS/pathLink"
-import {NodeView} from "../public/JS/rectNode"
-import {drag} from "../public/JS/nodeDrag"
+import {rectangleChart} from "../public/JS/rectNode"
+import {boardAside,boardStart,boardBackGround} from "../public/JS/borderBackgroundAside"
+import {graph} from "../public/JS/nodeData";
 
+class ModalViewDropForm extends React.Component{
+  constructor(props){
+    super(props);
+    this.state = {
+      value: this.props.name
+    }
+  }
+  handleSelect = (eventKey, event)=>{
+    this.setState({
+      value:event.target.textContent.trim()
+    })
+  };
+  handleChangeData = ()=>{
+    this.props.onChangeData({id:this.props.name,data:this.state.value});
+  };
+  /*after component receive a new props*/
+  componentWillReceiveProps(newProps) {
+    this.setState({value: newProps.name})
+  }
+  render(){
+    return (
+      <Modal show = {this.props.show} size = "lg" centered aria-labelledby="contained-modal-title-vcenter" onHide={this.props.onHide} >
+        <Modal.Header closeButton>
+          <Modal.Title id="contained-modal-title-vcenter">
+            select different way to transform packageData
+          </Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <Form>
+            < Form.Group controlId = "inputValue">
+              <Form.Label>
+                selectedValue:{this.state.value}
+              </Form.Label>
+              <DropdownButton
+                id="dropdown-basic-button"
+                title= {this.state.value}
+                variant = "drug-button"
+                className = "drugButton"
+                onSelect = {this.handleSelect} >
+                <Dropdown.Item href="#/action-1" >byPass</Dropdown.Item>
+                <Dropdown.Item href="#/action-2">token</Dropdown.Item>
+                <Dropdown.Item href="#/action-3">drop</Dropdown.Item>
+              </DropdownButton>
+            </Form.Group>
+          </Form>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant = "secondary" onClick = {this.props.onHide}>Close</Button>
+          <Button variant = "primary"  onClick = {this.handleChangeData}>changeData</Button>
+        </Modal.Footer>
+      </Modal>
+    )
+  }
+}
 
-class ModalViewClass extends React.Component{
+class ModalViewInputForm extends React.Component{
   constructor(props){
     super(props);
     this.state = {
@@ -67,16 +115,18 @@ class D3Example extends React.Component{
       value: null
     }
   }
+  /*dom node were rendered*/
   componentDidMount(){
-    this.rectangleChart(this.props.data,this.props.id);
+   rectangleChart(this.props.data,this.props.id,this.handleViewClick);
   }
+  /*dom node were updated*/
   componentDidUpdate(){
-    this.rectangleChart(this.props.data,this.props.id);
+    rectangleChart(this.props.data,this.props.id,this.handleViewClick);
   }
-  handleViewClick= (name)=>{
+  handleViewClick= (value)=>{
     this.setState({
       show: true,
-      name: name.name
+      name: value.name
     })
   };
   handleDeleteData= (name)=>{
@@ -93,76 +143,38 @@ class D3Example extends React.Component{
       show: false
     })
   };
-  rectangleChart = (data,id)=>{
-    let svgWidth = 1200, svgHeight = 300;
-    let {nodes, links} =data;
-    let width = 100,height2 = 60,width2 = 100+30;
-    let offSet = 10, space = 50;
-    let pathStartX =  width2 + space + width;
-    let pathStartY = height2+30;
-    let controlDot = 4;
-    let pathArray = [];
-
-    /*path data*/
-    nodes.forEach(function (item,index) {
-      let tempArray  = [];
-      for(let i = 0; i < 5; i++){
-        if (item.name === "Pass-Unconditionally" || item.name === "impair"||item.name === "Drop-Unconditionally"){
-          tempArray.push([0,0]);
-        }
-        else{
-          tempArray.push([pathStartX+space/controlDot*i+(width+50)*(index-3),pathStartY+40]);
-        }
-      }
-      let tempObj =  new GeneratePathData(item.name,tempArray);
-      pathArray.push(tempObj);
-    });
-
-    d3.select("#"+id).selectAll("svg").remove();
-    let  svg = d3.select("#"+id).append("svg").attr("width", svgWidth).attr("height",svgHeight).style("margin","10 auto 0 150");
-
-    /*define svg arrow*/
-    svg.append("defs")
-        .append("marker")
-        .attr("id", "arrow")
-        .attr("orient", "auto")
-        .attr("preserveAspectRatio", "none")
-        .attr("viewBox", "0 0 10 10")
-        .attr("refX", 5) /*to define the link position of marker*/
-        .attr("refY", 5)
-        .attr("markerWidth", 10)
-        .attr("markerHeight", 10)
-        .attr("markerUnits","userSpaceOnUse")
-        .append("path")
-        .attr("d", "M0,0 L0,10 L10,5 z")
-        .attr("fill","#57cc1a");
-
-    svg.append("rect").attr("width","1200").attr("height",300).attr("fill","white");
-    /*draw line*/
-    /*coordinate offset (10,-10)*/
-    /*here is problem of coordinate*/
-    // let linkGroup = svg.append("g").attr("transform","translate(10,-10)");
-    // LinkView(linkGroup, pathArray);
-
-    /*coordinate offset (10,10)*/
-    const  nodeGroup = svg
-      .append("g").attr("transform","translate(10,30)");
-    NodeView(nodeGroup ,this.handleViewClick, nodes );
-
-    /*define drag event*/
-    d3.selectAll(".nodeInterface")
-      .call(drag);
-  };
-  render(){
-    return(
+  JudeFormType = (name)=>{
+    if(name === "byPass" || name === "token" || name === "drop") {
+      return (
+        <div id={this.props.id}>
+          <ModalViewDropForm
+            show={this.state.show}
+            onHide={this.handleHide}
+            onChangeData={this.handleChangeData}
+            name={this.state.name}
+          />
+        </div>
+      )
+    }
+      else{
+        return(
           <div id = {this.props.id}>
-            <ModalViewClass
+            <ModalViewInputForm
               show = {this.state.show}
               onHide = {this.handleHide}
               onChangeData = {this.handleChangeData}
               name ={this.state.name}
               value = {this.state.value}
             />
+          </div>
+        )
+      }
+  };
+
+  render(){
+    return(
+          <div id = {this.props.id}>
+            {this.JudeFormType(this.state.name)}
           </div>
     )
   }
@@ -222,13 +234,28 @@ class D3Parent extends React.Component{
       data: this.state.data
     })
   };
+
+  componentDidMount(){
+   boardBackGround(null,"boardBackground");
+   boardAside(null,"boardAside");
+   boardStart(null,"boardStart");
+  }
+  /*dom node were updated*/
+  componentDidUpdate(){
+    // boardBackGround(null,"boardBackground");
+    // boardAside(null,"boardAside");
+  }
+
   render(){
     return (
-        <div className = "board">
-          <div className = "board-title">
-            <h4>Flow0</h4>
+        <div className = "board" id = "board">
+          <div className="board-back" id="boardBackground">
           </div>
-          <div >
+          <div className="board-aside" id="boardAside">
+          </div>
+          <div className="board-start" id="boardStart">
+          </div>
+          <div className="board-content">
             <D3Example
               data = {this.state.data}
               id = {this.state.id}
@@ -236,26 +263,9 @@ class D3Parent extends React.Component{
               onDeleteData = {this.handleDeleteData}
             />
           </div>
-          <div className="board-content">
-            <DropdownButton id="dropdown-basic-button" title="filter" className = "border-content-button" variant = "Secondary" >
-              <Dropdown.Item href="#/action-1">Pass</Dropdown.Item>
-              <Dropdown.Item href="#/action-2">Fail</Dropdown.Item>
-            </DropdownButton>
-          </div>
         </div>
     )
   }
 }
-
-let graph = {"nodes":["Pass-Unconditionally","impair","Drop-Unconditionally","Policing","Drop","Misorder","Lattency","Shaping","Duplicate","Corruption"],
-  "links":[{"source":1,"target":3},{"source":3,"target":4},{"source":4,"target":5},{"source":5,"target":6},{"source":6,"target":7},{"source":7,"target":8},{"source":8,"target":9}]};
-graph.nodes = graph.nodes.map(function (d){
-  return { name: d };
-});
-graph.links = graph.links.map(function (d){
-  d.source = graph.nodes[d.source];
-  d.target = graph.nodes[d.target];
-  return d
-});
 
 export default D3Parent
